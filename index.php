@@ -1,8 +1,3 @@
-<?php
-include('includes/app.php');
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,37 +14,41 @@ include('includes/app.php');
   <header>
     <h2>Product List</h2>
     <nav>
-      <button class="add-btn" id="addBtn">ADD</button>
-      <button class="mass-btn" type="submit" id="deleteBtn" form="delete_form" name="delete" value="delete">MASS DELETE</button>
+      <button class="add-btn" id="addBtn"><span>ADD</span></button>
+      <button class="mass-btn" type="submit" id="deleteBtn" form="delete_form" name="delete" value="delete" onclick="checkSelected();"><span>MASS DELETE</span></button>
     </nav>
   </header>
   <section class="product-list-wrapper">
-  <form method="POST" action="delete.php" id="delete_form">
-    
-  <?php $database = new Dbh(); 
-  $db = $database->connect(); 
-  $posts = new ProductShow($db);
-  $posts->ShowAllProducts(); ?>
+    <form method="POST" action="delete.php" id="delete_form">
 
-  <!-- <?php foreach($posts->read() as $product) : ?>
+      <?php
 
-    <table>
-            <tbody>
-              <tr class="content">
-                <th> <input type="checkbox" name="checkbox[]" value="<?= $product['id'] ?>"> </th>
-                <td style="visibility: hidden"><?= $product['id'] ?></td>
-                <td><?= $product['SKU'] ?></td>
-                <td><?= $product['Name'] ?></td>
-                <td><?= $product['Price'] ?>$</td>
-                  <td> Size: <?= $product['getAttributes'] ?> MB </td>
-                  <td> Weight: <?= $product['getAttributes'] ?> KG </td>
-                  <td> Dimensions: <?= $product['getAttributes'] ?> x <?= $product['Length'] ?> x <?= $product['Width'] ?> CM </td>
-               </tr>
-            </tbody>
-          </table>
+      require('includes/app.php');
 
-    <?php endforeach; ?> -->
-  </form>
+      $database = new Dbh();
+      $db = $database->connect();
+
+      $post = new Post($db);
+      $products = $post->read();
+      
+      if(!empty($products)){
+      foreach ($products as $product) {
+
+        echo "<table>";
+        echo        "<tbody>";
+        echo         "<tr class='content'>";
+        echo          "<th> <input type='checkbox' name='checkbox[]' value='" . $product->getId()  ."'> </th>";
+        echo            "<td>" .  $product->getSku() . "</td>";
+        echo            "<td>" .  $product->getName() . "</td>";
+        echo            "<td>" .  $product->getPrice() . "</td>";
+        echo            "<td>"  . implode(', ', $product->getAdditionalProperties()) . "</td>";
+        echo           "</tr>";
+        echo        "</tbody>";
+        echo      "</table>";
+      }
+    }
+      ?>
+    </form>
   </section>
   <footer class="footer-wrap">
     <div class="footer">

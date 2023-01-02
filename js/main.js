@@ -5,10 +5,6 @@ document.getElementById('addBtn').onclick = function () {
     location.href = 'product-add.php'
 }
 
-document.getElementById('cancelBtn').onclick = function () {
-    location.href = 'index.php'
-}
-
 // Dissapearing boxes
 
 
@@ -38,4 +34,21 @@ function selectChanged() {
     }
   }
 
+  const cells = document.querySelectorAll('table tbody .content');
+
+cells.forEach(cell => {
+  cell.addEventListener('click', event => {
+    const checkbox = cell.querySelector('input[type="checkbox"]');
+    checkbox.checked = !checkbox.checked;
+  });
+});
   
+function checkSelected() {
+  var checkbox = document.querySelectorAll('input[type=checkbox]:checked');
+  if (checkbox.length == 0) {
+    alert('Please select one or more items');
+    return false;
+  } else {
+    document.getElementById('delete_form').submit();
+  }
+}

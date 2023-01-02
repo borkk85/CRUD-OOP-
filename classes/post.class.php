@@ -1,148 +1,118 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
 
-class Post 
-
+class Post
 {
-  //DB 
-  private $conn;
-  private $table = 'skandi';
-
-  //Properties 
 
 
-  public function __construct($db) {
-    $this->conn = $db;
-  }
-  
-  public function insertData()
-  {
-    $query = 'INSERT INTO ' . $this->table . '
-            SET             
-            
-            sku = :sku,
-            name = :name,
-            price = :price,
-            productType = :productType,
-            size = :size,
-            weight = :weight,
-            height = :height,
-            length = :length,
-            width = :width';
 
-            $stmt = $this->conn->prepare($query);
+    public $conn;
+    public $table = 'skandi';
+
+
+    public function __construct(PDO $db)
+    {
+
+        $this->conn = $db;
+    }
+
+    public function read()
+    {
+        $query = 'SELECT 
+              id,
+              sku,
+              name, 
+              price, 
+              productType,
+              size, 
+              weight, 
+              height, 
+              length, 
+              width FROM ' . $this->table . ' ORDER BY id DESC';
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        // echo "SQL Query: " . $query . "\n";
+
+        $data = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $product = Product::createProduct($row);
+            // Add the product object to the data array
+            $data[] = $product;
+
           
-            $this->sku;
-            $this->name; 
-            $this->price; 
-            $this->productType; 
-            $this->size;
-            $this->weight;
-            $this->height;
-            $this->length;
-            $this->width;
+        //   print_r($data);
+   
+          
+        }
+        return $data;
 
-            $stmt->bindParam(':sku', $this->sku);
-            $stmt->bindParam(':name', $this->name);
-            $stmt->bindParam(':price', $this->price);
-            $stmt->bindParam(':productType', $this->productType);
-            $stmt->bindParam(':size', $this->size);
-            $stmt->bindParam(':weight', $this->weight);
-            $stmt->bindParam(':height', $this->height);
-            $stmt->bindParam(':length', $this->length);
-            $stmt->bindParam(':width', $this->width);
+    }
 
-            try {
-              $stmt->execute();
+    public function insert($data) {  
 
-              return true;
+        $set_terms = [];
+        $params = [];
 
-            } catch (PDOException $e) {
-              if($e->errorInfo[1]==1062) {
+        foreach(array_keys($data) as $field ) {
+            $set_terms[] = "`$field`=?";
+            $params[] = $data[$field];
+        }
+
+        $params = array_values($params);
+
+         // Prepare the INSERT INTO query
+          $query = "INSERT INTO `$this->table` SET " . implode(',',$set_terms);
+
+          $stmt = $this->conn->prepare($query);
+    
+          // Bind the values from the data array to the placeholders in the query
+    
+
+          try {      
+            // Execute the query
+            $stmt->execute($params);
+            // Return true if the query was successful
+            return true;
+           
+      
+          } catch(PDOException $e) {
+            if ($e->errorInfo[1] == 1062) {
+                // Error code 1062 indicates a unique constraint violation
+                // Return false or throw an exception to indicate the error
+                $this->errors['sku'] = 'SKU already exists';
+                $this->errors['name'] = 'Name already exists';
+
                 return false;
               }
+              // Other error, so throw the exception
               throw $e;
-            }
-  }
-
-  public function read()
-  {
-    $query = 'SELECT 
-    p.id as id, 
-    p.sku,
-    p.name, 
-    p.price, 
-    p.productType,
-    p.size, 
-    p.weight, 
-    p.height, 
-    p.length, 
-    p.width FROM '. $this->table .' p  ORDER BY p.id DESC'; 
-
-  $stmt = $this->conn->prepare($query);
-  $stmt->execute();
-
-  return $stmt;
-
-  }
-
-  public function delete()
-  {
-    try {
-      $stmt = $this->conn->prepare("DELETE FROM skandi WHERE id = ?");
-      $stmt->execute([$this->id]);
-      return $stmt->fetchAll();
-    } catch (Exception $e) {
-      return $e->getMessage();
-    }
-  }
-
-  public function checkItemExists()
-  {
-    try {
-      $stmt = $this->conn->prepare("SELECT * FROM skandi WHERE sku = ?");
-      $stmt->execute([$this->sku]);
-      $result = $stmt->fetchAll(); 
-      if(count($result) == 0) {
-        return false;
-        
-    } 
-        else {
-        return true;
+          }
+              
+     
       }
-      }catch (Exception $e) {
-      return $e->getMessage();
-    }
-  }
+
+
+      public function delete($id) {
+        try {
+            $sql = "DELETE FROM skandi WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(1, $id);
+            $stmt->execute();
+            return true;
+            header('location:index.php');
+        } catch(PDOException $e) {
+            // Log the error or display an error message
+            // You can also throw the exception again if you want to handle it differently
+            throw $e;
+            return false;
+        }
+    } 
 }
-  // public function getPost() {
-  //     $sql = "SELECT * FROM skandi";
-  //     $stmt = $this->connect()->prepare($sql);
-  //     $stmt->execute();
 
-  //     while($result = $stmt->fetchAll()) {
-  //       return $result;
-  //     };
-  //   }
 
-  //   public function addPost($sku, $name, $price, $productType, $size, $weight, $height, $length, $width) {
-
-  //     $sql = "SELECT * FROM skandi WHERE sku = 'sku'";
-  //     $stmtCheck = $this->connect()->prepare($sql);
-  //     $stmtCheck->execute();
-  //     if ($stmtCheck->rowCount() > 0) {
-  //     echo 'product SKU already exists';
-  //     header('Location: product-add.php');
-
-  //     } else {
-  //     $sql = "INSERT INTO skandi(sku, name, price, productType, size, weight, height, length, width) 
-  //     VALUES('$sku','$name','$price','$productType', '$size' ,'$weight','$height','$length', '$width')";
-  //     $stmt = $this->connect()->prepare($sql);
-  //     $stmt->execute();
-
-  //     header('Location:index.php');
-  //     exit();
-  //     }
-  //   }
 

@@ -1,17 +1,19 @@
 <?php
 
-class DVD extends Product implements HaveSize {
+class DVD extends Product {
 
-    protected $size;
+    use DvdTrait;
 
-    public function __construct($sku, $name, $price, $size) {
-
-        parent::__construct($sku, $name, $price);
-
-        $this->size = $size;
+    public function __construct($id, $sku, $name, $price, $productType, $size)
+    {
+        // Call the parent constructor to initialize the sku, name, price, and productType properties
+        parent::__construct($id, $sku, $name, $price, $productType, ['Size: ' . $size]);
     }
-    
-    use Withsize;
 
+    public function getAdditionalProperties(): array
+    {
+        // Return an array of the additional properties for the DVD object
+        return parent::getAdditionalProperties();
+    }
 
 }

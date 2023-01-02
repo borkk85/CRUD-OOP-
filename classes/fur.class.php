@@ -1,20 +1,16 @@
-<?php 
+<?php
 
-class Fur extends Product implements HaveFurniture {
+class Fur extends Product   {
 
-    protected $height;
-    protected $length;
-    protected $width;
+    use FurTrait;
 
-    public function __construct($sku, $name, $price, $height, $length, $width) {
-
-        parent::__construct($sku, $name, $price);
-
-        $this->height = $height;
-        $this->length = $length;
-        $this->width = $width;
+    public function __construct($id, $sku, $name, $price, $productType, $height, $length, $width) {
+        // Call the parent constructor to initialize the sku, name, price, and productType properties
+        parent::__construct($id, $sku, $name, $price, $productType, ['Height: ' . $height, 'Length: ' . $length, 'Width: ' . $width]);
     }
-    
- use WithFurniture;
-   
+
+    public function getAdditionalProperties(): array {
+        // Return an array of the additional properties for the Furniture object
+        return parent::getAdditionalProperties();
+    }
 }

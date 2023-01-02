@@ -1,17 +1,17 @@
-<?php 
+<?php
 
-class Book extends Product implements HaveWeight {
+class Book extends Product  {
 
-    protected $weight;
+use BookTrait;
 
-    public function __construct($sku, $name, $price, $weight) {
+  public function __construct($id, $sku, $name, $price, $productType, $weight) {
+    // Call the parent constructor to initialize the sku, name, price, and productType properties
+    parent::__construct($id, $sku, $name, $price, $productType, ['Weight: ' . $weight]);
+}
 
-        parent::__construct($sku, $name, $price);
-
-        $this->weight = $weight;
-    }
-    
-use WithWeight;
-
+public function getAdditionalProperties(): array {
+    // Return an array of the additional properties for the DVD object
+    return parent::getAdditionalProperties();
+}
 
 }
