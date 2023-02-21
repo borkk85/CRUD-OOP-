@@ -2,18 +2,28 @@
 
 class DVD extends Product {
 
-    use DvdTrait;
+    use CommonTrait;
 
-    public function __construct($id, $sku, $name, $price, $productType, $size)
+    protected $size;
+
+    public function __construct($id, $sku, $name, $price, $productType, $size = null)
     {
-        // Call the parent constructor to initialize the sku, name, price, and productType properties
-        parent::__construct($id, $sku, $name, $price, $productType, ['Size: ' . $size]);
+            $this->size = $size;
+            $this->additionalProperties[] = $this->size;
+            parent::__construct($id, $sku, $name, $price, $productType, $this->additionalProperties);
+    
+    }
+    
+    public function setSize($size)
+    {
+        $this->size = $size;
+        $this->additionalProperties[] = $this->size;
     }
 
-    public function getAdditionalProperties(): array
+    
+    public function getSize()
     {
-        // Return an array of the additional properties for the DVD object
-        return parent::getAdditionalProperties();
+        return $this->size;
     }
-
+    
 }
