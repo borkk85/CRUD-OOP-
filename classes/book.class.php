@@ -2,16 +2,26 @@
 
 class Book extends Product  {
 
-use BookTrait;
+  use CommonTrait;
 
-  public function __construct($id, $sku, $name, $price, $productType, $weight) {
-    // Call the parent constructor to initialize the sku, name, price, and productType properties
-    parent::__construct($id, $sku, $name, $price, $productType, ['Weight: ' . $weight]);
-}
+  protected $weight;
 
-public function getAdditionalProperties(): array {
-    // Return an array of the additional properties for the DVD object
-    return parent::getAdditionalProperties();
-}
-
+  public function __construct($id, $sku, $name, $price, $productType, $weight)
+  {
+            $this->weight = $weight;
+            $this->additionalProperties = [$this->weight];
+            parent::__construct($id, $sku, $name, $price, $productType, $this->additionalProperties);
+  }
+  
+  public function setWeight($weight)
+  {
+      $this->weight = $weight;
+      $this->additionalProperties[] =  $this->weight;
+  }
+  
+  public function getWeight()
+  {
+      return $this->weight;
+  }
+  
 }
