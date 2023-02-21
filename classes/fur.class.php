@@ -2,15 +2,55 @@
 
 class Fur extends Product   {
 
-    use FurTrait;
+    use CommonTrait;
 
-    public function __construct($id, $sku, $name, $price, $productType, $height, $length, $width) {
-        // Call the parent constructor to initialize the sku, name, price, and productType properties
-        parent::__construct($id, $sku, $name, $price, $productType, ['Height: ' . $height, 'Length: ' . $length, 'Width: ' . $width]);
+    protected $height;
+    protected $length;
+    protected $width;
+    
+    public function __construct($id, $sku, $name, $price, $productType, $height, $length, $width)
+    {
+        $this->height = $height;
+        $this->length = $length;
+        $this->width = $width;
+        $this->additionalProperties[] = $this->height;
+        $this->additionalProperties[] = $this->length;
+        $this->additionalProperties[] = $this->width;
+    
+        parent::__construct($id, $sku, $name, $price, $productType, $this->additionalProperties);
     }
-
-    public function getAdditionalProperties(): array {
-        // Return an array of the additional properties for the Furniture object
-        return parent::getAdditionalProperties();
+    
+    public function setHeight($height)
+    {
+        $this->height = $height;
+        $this->additionalProperties[] = $this->height;
     }
+    
+    public function getHeight()
+    {
+        return $this->height;
+    }
+    
+    public function setLength($length)
+    {
+        $this->length = $length;
+        $this->additionalProperties[] = $this->length;
+    }
+    
+    public function getLength()
+    {
+        return $this->length;
+    }
+    
+    public function setWidth($width)
+    {
+        $this->width = $width;
+        $this->additionalProperties[] = $this->width;
+    }
+    
+    public function getWidth()
+    {
+        return $this->width;
+    }
+    
 }
